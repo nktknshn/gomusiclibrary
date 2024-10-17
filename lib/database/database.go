@@ -27,13 +27,48 @@ func NewFromFile(path string) (*Database, error) {
 	return New(conn), nil
 }
 
-func (db *Database) FilesList() ([]models.File, error) {
+func (db *Database) FilesList() (models.FileSlice, error) {
 
-	// var result []models.File
+	var result []models.File
 
 	err := sqlitex.Execute(db.conn, "SELECT id, path, size, hash, ctime, mtime, created_at, updated_at, deleted_at FROM file;", &sqlitex.ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
-			fmt.Println(stmt)
+			// fmt.Println(stmt)
+			var err error
+			var f models.File
+			f.ID = models.FileID(stmt.ColumnInt64(0))
+			f.Path = stmt.ColumnText(1)
+			f.Size = stmt.ColumnInt64(2)
+			f.Sha256Hash = stmt.ColumnText(3)
+			f.Ctime = stmt.ColumnInt64(4)
+			f.Mtime = stmt.ColumnInt64(5)
+
+			f.CreatedAt, err = time.Parse(time.DateTime, stmt.ColumnText(6))
+
+			if err != nil {
+				return fmt.Errorf("database: list files: %w", err)
+			}
+
+			if stmt.ColumnType(7) == sqlite.TypeNull {
+				f.UpdatedAt = time.Time{}
+			} else {
+				f.UpdatedAt, err = time.Parse(time.DateTime, stmt.ColumnText(7))
+				if err != nil {
+					return fmt.Errorf("database: list files: %w", err)
+				}
+			}
+
+			if stmt.ColumnType(8) == sqlite.TypeNull {
+				f.DeletedAt = time.Time{}
+			} else {
+				f.DeletedAt, err = time.Parse(time.DateTime, stmt.ColumnText(8))
+				if err != nil {
+					return fmt.Errorf("database: list files: %w", err)
+				}
+			}
+
+			result = append(result, f)
+
 			return nil
 		},
 	})
@@ -42,7 +77,7 @@ func (db *Database) FilesList() ([]models.File, error) {
 		return nil, fmt.Errorf("database: list files: %w", err)
 	}
 
-	return nil, nil
+	return result, nil
 }
 
 /*

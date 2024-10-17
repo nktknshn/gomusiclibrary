@@ -30,7 +30,10 @@ func conn() (*sqlite.Conn, error) {
 }
 
 var (
-	f1 = models.File{Path: "/test/1.mp3", Size: 667, Sha256Hash: "", Ctime: 0, Mtime: 0, CreatedAt: time.Now()}
+	files = models.FileSlice{
+		{Path: "/test/1.mp3", Size: 667, Sha256Hash: "", Ctime: 0, Mtime: 0, CreatedAt: time.Now()},
+		{Path: "/test/2.mp3", Size: 777, Sha256Hash: "", Ctime: 0, Mtime: 0, CreatedAt: time.Now()},
+	}
 )
 
 func TestInsertAndList(t *testing.T) {
@@ -40,7 +43,12 @@ func TestInsertAndList(t *testing.T) {
 	defer c.Close()
 
 	d := database.New(c)
-	err = d.FilesInsert(models.FileSlice{f1})
+	err = d.FilesInsert(files)
 	require.NoError(t, err)
+
+	f, err := d.FilesList()
+	require.NoError(t, err)
+
+	require.Equal(t, []models.FileID{1, 2}, f.IDs())
 
 }
