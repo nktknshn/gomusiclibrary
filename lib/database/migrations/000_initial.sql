@@ -28,7 +28,11 @@ CREATE TABLE file_audio_tag (
     deleted_at TEXT,
 
     FOREIGN KEY(file_id) REFERENCES file(id)
+    UNIQUE(file_id, name)
 ) STRICT;
+
+-- index on file_id, name
+CREATE INDEX file_audio_tag_file_id_name_idx ON file_audio_tag(file_id, name);
 
 -- down
 

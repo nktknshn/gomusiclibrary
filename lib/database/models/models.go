@@ -2,10 +2,10 @@ package models
 
 import "time"
 
-type TagID int64
+type AudioTagID int64
 
 type AudioTag struct {
-	ID     TagID
+	ID     AudioTagID
 	FileID FileID
 
 	Name  string
@@ -15,3 +15,5 @@ type AudioTag struct {
 	UpdatedAt time.Time
 	DeletedAt time.Time
 }
+
+type AudioTagSlice []AudioTag

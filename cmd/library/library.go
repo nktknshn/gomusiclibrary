@@ -8,6 +8,7 @@ import (
 func init() {
 	cli.Cmd.AddCommand(&cmdLibrary)
 	cmdLibrary.AddCommand(&cmdLibraryList)
+	cmdLibrary.AddCommand(&cmdLibraryTags)
 }
 
 var cmdLibrary = cobra.Command{

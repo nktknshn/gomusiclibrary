@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/nktknshn/gomusiclibrary/lib/util/colutil"
+)
 
 type FileID int64
 
@@ -20,15 +24,17 @@ type File struct {
 type FileSlice []File
 
 func (fs FileSlice) IDs() []FileID {
-	return MapFileSlice(fs, func(f File) FileID {
+	return colutil.MapSlice(fs, func(f File) FileID {
 		return f.ID
 	})
 }
 
-func MapFileSlice[T any](fs FileSlice, fn func(File) T) []T {
-	res := make([]T, len(fs))
-	for idx, f := range fs {
-		res[idx] = fn(f)
-	}
-	return res
+func (fs FileSlice) Paths() []string {
+	return colutil.MapSlice(fs, func(f File) string {
+		return f.Path
+	})
+
 }
+
+type FileMapID map[FileID]File
+type FileMapPath map[string]File

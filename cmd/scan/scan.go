@@ -1,6 +1,7 @@
 package scan
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path"
@@ -64,6 +65,8 @@ func scan(cmd *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("Insert %d files.\n", len(files))
 
 	err = db.FilesInsert(files)
 
