@@ -7,7 +7,6 @@ CREATE TABLE file (
     size INTEGER,
     hash TEXT,
 
-    ctime TEXT,
     mtime TEXT,
 
     created_at TEXT NOT NULL,

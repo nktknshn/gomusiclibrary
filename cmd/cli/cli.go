@@ -3,6 +3,7 @@ package cli
 import (
 	"os"
 
+	"github.com/nktknshn/gomusiclibrary/lib/database"
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +26,14 @@ func GetDatabaseFileMust() string {
 		panic("Database file is not set")
 	}
 	return e
+}
+
+func GetDatabaseMust() *database.Database {
+	db, err := database.NewFromFile(GetDatabaseFileMust())
+	if err != nil {
+		panic(err)
+	}
+	return db
 }
 
 func init() {

@@ -1,12 +1,13 @@
 package scan
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
+	"path"
 
 	"github.com/nktknshn/gomusiclibrary/cmd/cli"
 	"github.com/nktknshn/gomusiclibrary/lib/database"
+	"github.com/nktknshn/gomusiclibrary/lib/database/models"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +23,7 @@ var cmdScan = cobra.Command{
 
 func scan(cmd *cobra.Command, args []string) {
 
-	_, err := database.NewFromFile(cli.GetDatabaseFileMust())
+	db, err := database.NewFromFile(cli.GetDatabaseFileMust())
 
 	if err != nil {
 		panic(err)
@@ -31,12 +32,40 @@ func scan(cmd *cobra.Command, args []string) {
 	folder := args[0]
 
 	var d fs.FS = os.DirFS(folder)
+	var files []models.File
 
-	err = fs.WalkDir(d, ".", func(path string, d fs.DirEntry, err error) error {
-		fmt.Println(path)
+	err = fs.WalkDir(d, ".", func(p string, d fs.DirEntry, err error) error {
+
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() {
+			return nil
+		}
+
+		info, err := d.Info()
+
+		if err != nil {
+			return err
+		}
+
+		f := models.File{
+			Path:  path.Join(folder, p),
+			Size:  info.Size(),
+			Mtime: info.ModTime(),
+		}
+
+		files = append(files, f)
 
 		return err
 	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = db.FilesInsert(files)
 
 	if err != nil {
 		panic(err)

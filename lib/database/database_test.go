@@ -15,24 +15,27 @@ import (
 )
 
 func conn() (*sqlite.Conn, error) {
-	c, err := sqlite.OpenConn(":memory:")
+	conn, err := sqlite.OpenConn(":memory:")
 	if err != nil {
 		panic(err)
 	}
 
-	err = migration.MigrateConn(context.Background(), c, os.DirFS(tests.CurrentTestPath("migrations")))
+	err = migration.MigrateConn(context.Background(), conn, os.DirFS(tests.CurrentTestPath("migrations")))
 
 	if err != nil {
 		return nil, err
 	}
 
-	return c, err
+	return conn, err
 }
 
 var (
 	files = models.FileSlice{
-		{Path: "/test/1.mp3", Size: 667, Sha256Hash: "", Ctime: 0, Mtime: 0, CreatedAt: time.Now()},
-		{Path: "/test/2.mp3", Size: 777, Sha256Hash: "", Ctime: 0, Mtime: 0, CreatedAt: time.Now()},
+		{Path: "/test/1.mp3", Size: 667, Sha256Hash: "",
+			Mtime: time.Now().Add(-time.Hour), CreatedAt: time.Now()},
+
+		{Path: "/test/2.mp3", Size: 777, Sha256Hash: "",
+			Mtime: time.Now().Add(-time.Hour), CreatedAt: time.Now()},
 	}
 )
 

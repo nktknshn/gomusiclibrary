@@ -10,8 +10,7 @@ type File struct {
 	Size       int64
 	Sha256Hash string
 
-	Ctime int64
-	Mtime int64
+	Mtime time.Time
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
